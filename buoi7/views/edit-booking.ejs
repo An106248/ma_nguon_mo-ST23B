@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sửa đặt chỗ</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-edit"></i> Sửa đặt chỗ</h1>
+        
+        <% if (locals.error) { %>
+            <div class="alert error">
+                <i class="fas fa-exclamation-circle"></i>
+                <%= error %>
+            </div>
+        <% } %>
+        
+        <form action="/booking/update/<%= booking.id %>" method="POST">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Tên khách hàng:</label>
+                <input type="text" name="customerName" required 
+                       value="<%= booking.customerName %>"
+                       placeholder="Nhập tên khách hàng">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-calendar"></i> Ngày:</label>
+                <input type="date" name="date" required 
+                       value="<%= booking.date %>">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> Giờ:</label>
+                <input type="time" name="time" required 
+                       value="<%= booking.time %>">
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn">
+                    <i class="fas fa-save"></i> Cập nhật
+                </button>
+                <a href="/" class="btn secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <div class="toast-container"></div>
+    
+    <script>
+        // Thêm script showToast từ index.ejs vào đây
+    </script>
+</body>
+</html>

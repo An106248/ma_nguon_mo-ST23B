@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Danh sách đặt chỗ</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Danh sách đặt chỗ</h1>
+        
+        <% if (messages && messages.success) { %>
+            <div class="alert success"><%= messages.success %></div>
+        <% } %>
+        
+        <a href="/booking/new" class="btn new">Đặt chỗ mới</a>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tên khách hàng</th>
+                    <th>Ngày</th>
+                    <th>Giờ</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% bookings.forEach(booking => { %>
+                    <tr>
+                        <td><%= booking.id %></td>
+                        <td><%= booking.customerName %></td>
+                        <td><%= booking.date %></td>
+                        <td><%= booking.time %></td>
+                        <td>
+                            <span class="status-badge <%= booking.status.toLowerCase() %>">
+                                <%= booking.status %>
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <% if (booking.status !== 'Cancelled') { %>
+                                    <a href="/booking/edit/<%= booking.id %>" class="btn small edit">
+                                        <i class="fas fa-edit"></i> Sửa
+                                    </a>
+                                    <form action="/booking/cancel/<%= booking.id %>" method="POST" class="inline-form">
+                                        <button type="submit" class="btn small danger">
+                                            <i class="fas fa-times"></i> Hủy
+                                        </button>
+                                    </form>
+                                <% } %>
+                            </div>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="toast-container"></div>
+
+    <script>
+    function showToast(message, type = 'success') {
+        const toastContainer = document.querySelector('.toast-container');
+        
+        // Tạo toast element
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        // Icon cho từng loại thông báo
+        let icon = '';
+        switch(type) {
+            case 'success':
+                icon = 'check-circle';
+                break;
+            case 'error':
+                icon = 'times-circle';
+                break;
+            case 'warning':
+                icon = 'exclamation-circle';
+                break;
+        }
+        
+        toast.innerHTML = `
+            <i class="fas fa-${icon} toast-icon"></i>
+            <div class="toast-message">${message}</div>
+            <div class="toast-close">
+                <i class="fas fa-times"></i>
+            </div>
+        `;
+        
+        // Thêm toast vào container
+        toastContainer.appendChild(toast);
+        
+        // Xử lý nút đóng
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => {
+            toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+            setTimeout(() => toast.remove(), 300);
+        });
+        
+        // Tự động ẩn sau 5 giây
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => toast.remove(), 300);
+            }
+        }, 5000);
+    }
+
+    // Hiển thị toast message khi có thông báo từ server
+    <% if (messages && messages.success) { %>
+        showToast('<%= messages.success %>', 'success');
+    <% } %>
+    <% if (messages && messages.error) { %>
+        showToast('<%= messages.error %>', 'error');
+    <% } %>
+
+    // Thêm vào function confirmCancel hiện có
+    function confirmCancel(event) {
+        if (!confirm('Bạn có chắc muốn hủy đặt chỗ này?')) {
+            event.preventDefault();
+            return false;
+        }
+        showToast('Đang xử lý hủy đặt chỗ...', 'warning');
+        return true;
+    }
+
+    // Thêm event listener cho tất cả các form hủy
+    document.querySelectorAll('form[action^="/booking/cancel"]').forEach(form => {
+        form.addEventListener('submit', confirmCancel);
+    });
+    </script>
+</body>
+</html>
